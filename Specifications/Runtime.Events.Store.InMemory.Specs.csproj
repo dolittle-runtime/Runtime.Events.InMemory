@@ -1,12 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../specs.props"></Import>
 
+  <ItemGroup>
+    <Compile Include="./Specs/**/*.cs" Exclude="./Specs/obj/**/*.cs;./Specs/bin/**/*.cs"/>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>Dolittle.Runtime.Events.Store.InMemory.Specs</AssemblyName>
     <RootNamespace>Dolittle.Runtime.Events.Store.InMemory.Specs</RootNamespace>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Source\Runtime.Events.Source.InMemory.csproj" />
   </ItemGroup>
