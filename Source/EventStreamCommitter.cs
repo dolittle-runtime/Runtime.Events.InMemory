@@ -9,6 +9,9 @@ using Dolittle.Runtime.Events.Store;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
+    /// <summary>
+    /// Manages the committing and fetching of event streams for the <see cref="EventStore" />
+    /// </summary>
     public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents
     {
         private readonly object lock_object = new object();
@@ -20,6 +23,10 @@ namespace Dolittle.Runtime.Events.Store.InMemory
 
         private ulong _sequenceNumber = 0;
 
+        /// <summary>
+        /// Increments the count of commits
+        /// </summary>
+        /// <returns>The number of commits</returns>
         public ulong IncrementCount()
         {
             lock(lock_object)
@@ -28,11 +35,13 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             }
         }
 
+        /// <inheritdoc />
         public CommittedEventStream Commit(UncommittedEventStream uncommittedEvents)
         {
             return Commit(uncommittedEvents,IncrementCount());
         }
 
+        /// <inheritdoc />
         CommittedEventStream Commit(UncommittedEventStream uncommittedEvents, CommitSequenceNumber commitSequenceNumber)
         {
             lock(lock_object)
@@ -69,16 +78,19 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             }
         }
 
+        /// <inheritdoc />
         public CommittedEvents Fetch(EventSourceId eventSourceId)
         {
             return new CommittedEvents(_commits.Where(c => c.Source.EventSource == eventSourceId).ToList());
         }
 
+        /// <inheritdoc />
         public CommittedEvents FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
         {
             return new CommittedEvents(_commits.Where(c => c.Source.EventSource == eventSourceId && c.Source.Version.Commit >= commitVersion).ToList());
         }
 
+        /// <inheritdoc />
         public CommittedEvents FetchAllCommitsAfter(CommitSequenceNumber commit)
         {
             return new CommittedEvents(_commits.Where(c => c.Sequence > commit).ToList());
