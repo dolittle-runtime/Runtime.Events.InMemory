@@ -6,13 +6,14 @@ using System.Threading;
 using Dolittle.Events;
 using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
+using Dolittle.Artifacts;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
     /// <summary>
     /// Manages the committing and fetching of event streams for the <see cref="EventStore" />
     /// </summary>
-    public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents
+    public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents, IFetchEventSourceVersion
     {
         private readonly object lock_object = new object();
 
@@ -94,6 +95,30 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         public CommittedEvents FetchAllCommitsAfter(CommitSequenceNumber commit)
         {
             return new CommittedEvents(_commits.Where(c => c.Sequence > commit).ToList());
+        }
+
+        /// <inheritdoc />
+        public SingleEventTypeEventStream FetchAllEventsOfType(ArtifactId eventType)
+        {
+            var commits = _commits.Where(c => c.Events.Any(e => e.Metadata.Artifact.Id == eventType));
+            var events = new List<CommittedEventEnvelope>();
+            foreach(var commit in commits)
+            {
+                events.AddRange(commit.Events.FilteredByEventType(eventType).Select(e => new CommittedEventEnvelope(commit.Sequence,e.Id,e.Metadata,e.Event)));
+            }
+            return new SingleEventTypeEventStream(events);
+        }
+
+        /// <inheritdoc />
+        public SingleEventTypeEventStream FetchAllEventsOfTypeAfter(ArtifactId artifactId, CommitSequenceNumber commitSequenceNumber)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public EventSourceVersion GetVersionFor(EventSourceId eventSource)
+        {
+            throw new NotImplementedException();
         }
     }
 }
