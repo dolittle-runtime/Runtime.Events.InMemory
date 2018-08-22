@@ -6,6 +6,7 @@ using System.Threading;
 using Dolittle.Events;
 using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
+using Dolittle.Artifacts;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
@@ -82,6 +83,24 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         {
             ThrowIfDisposed();
             return _event_committer_and_fetcher.FetchAllCommitsAfter(commit);
+        }
+        /// <inheritdoc />
+        public SingleEventTypeEventStream FetchAllEventsOfType(ArtifactId eventType) 
+        {
+            ThrowIfDisposed();
+            return _event_committer_and_fetcher.FetchAllEventsOfType(eventType);
+        }
+        /// <inheritdoc />
+        public SingleEventTypeEventStream FetchAllEventsOfTypeAfter(ArtifactId eventType, CommitSequenceNumber commit)
+        {
+            ThrowIfDisposed();
+            return _event_committer_and_fetcher.FetchAllEventsOfTypeAfter(eventType,commit);
+        }
+        /// <inheritdoc />
+        public EventSourceVersion GetVersionFor(EventSourceId eventSourceId)
+        {
+            ThrowIfDisposed();
+            return _event_committer_and_fetcher.GetVersionFor(eventSourceId);
         }
     }
 }

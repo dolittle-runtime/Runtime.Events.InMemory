@@ -6,19 +6,20 @@ using System.Threading;
 using Dolittle.Events;
 using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
+using Dolittle.Artifacts;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
     /// <summary>
     /// Manages the committing and fetching of event streams for the <see cref="EventStore" />
     /// </summary>
-    public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents
+    public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents, IFetchEventSourceVersion
     {
         private readonly object lock_object = new object();
 
         private readonly List<CommittedEventStream> _commits = new List<CommittedEventStream>();
         private readonly HashSet<CommitId> _duplicates = new HashSet<CommitId>();
-        private readonly HashSet<VersionedEventSource> _versions = new HashSet<VersionedEventSource>();
+        private readonly ConcurrentDictionary<EventSourceId,VersionedEventSource> _versions = new ConcurrentDictionary<EventSourceId,VersionedEventSource>();
         private readonly ConcurrentDictionary<EventSourceId,EventSourceVersion> _currentVersions = new ConcurrentDictionary<EventSourceId,EventSourceVersion>();
 
         private ulong _sequenceNumber = 0;
@@ -52,7 +53,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
                 var commit = new CommittedEventStream(commitSequenceNumber, uncommittedEvents.Source, uncommittedEvents.Id, uncommittedEvents.CorrelationId, uncommittedEvents.Timestamp, uncommittedEvents.Events);
                 _commits.Add(commit);
                 _duplicates.Add(commit.Id);
-                _versions.Add(commit.Source);
+                _versions.AddOrUpdate(commit.Source.EventSource,commit.Source,(id,ver) => commit.Source);
                 return commit;
             }
         }
@@ -72,9 +73,13 @@ namespace Dolittle.Runtime.Events.Store.InMemory
 
         void ThrowIfConcurrencyConflict(VersionedEventSource version)
         {
-            if (_versions.Contains(version) || _versions.Any(v => v.EventSource == version.EventSource && v.Version.Commit >= version.Version.Commit))
+            VersionedEventSource ver;
+            if(_versions.TryGetValue(version.EventSource, out ver))
             {
-                throw new EventSourceConcurrencyConflict();
+                if (ver == version || ver.Version.Commit >= version.Version.Commit)
+                {
+                    throw new EventSourceConcurrencyConflict();
+                }
             }
         }
 
@@ -95,5 +100,40 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         {
             return new CommittedEvents(_commits.Where(c => c.Sequence > commit).ToList());
         }
+
+        /// <inheritdoc />
+        public SingleEventTypeEventStream FetchAllEventsOfType(ArtifactId artifactId)
+        {
+            var commits = _commits.Where(c => c.Events.Any(e => e.Metadata.Artifact.Id == artifactId));
+            return GetEventsFromCommits(commits, artifactId);
+        }
+
+        /// <inheritdoc />
+        public SingleEventTypeEventStream FetchAllEventsOfTypeAfter(ArtifactId artifactId, CommitSequenceNumber commitSequenceNumber)
+        {
+            var commits = _commits.Where(c => c.Sequence > commitSequenceNumber && c.Events.Any(e => e.Metadata.Artifact.Id == artifactId));
+            return GetEventsFromCommits(commits, artifactId);
+        }
+
+        /// <inheritdoc />
+        public EventSourceVersion GetVersionFor(EventSourceId eventSource)
+        {
+            VersionedEventSource v;
+            if(_versions.TryGetValue(eventSource, out v))
+            {
+                return v.Version;
+            }
+            return EventSourceVersion.Initial();
+        }
+
+         SingleEventTypeEventStream GetEventsFromCommits(IEnumerable<CommittedEventStream> commits, ArtifactId eventType)
+         {
+            var events = new List<CommittedEventEnvelope>();
+            foreach(var commit in commits)
+            {
+                events.AddRange(commit.Events.FilteredByEventType(eventType).Select(e => new CommittedEventEnvelope(commit.Sequence,e.Id,e.Metadata,e.Event)));
+            }
+            return new SingleEventTypeEventStream(events);
+         }
     }
 }
