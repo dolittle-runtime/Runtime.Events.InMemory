@@ -7,12 +7,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyName>Dolittle.Runtime.Events.Store.InMemory.Specs</AssemblyName>
-    <RootNamespace>Dolittle.Runtime.Events.Store.InMemory.Specs</RootNamespace>
+    <AssemblyName>Dolittle.Runtime.Events.InMemory.Specs</AssemblyName>
+    <RootNamespace>Dolittle.Runtime.Events.InMemory.Specs</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Source\Runtime.Events.Source.InMemory.csproj" />
+    <ProjectReference Include="..\Source\Runtime.Events.InMemory.csproj" />
   </ItemGroup>
 
 </Project>
