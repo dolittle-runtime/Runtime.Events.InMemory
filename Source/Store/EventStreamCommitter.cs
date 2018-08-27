@@ -59,9 +59,9 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             }
         }
 
-        void UpdateVersion(CommittedEventStream committedEvents)
+        void UpdateVersion(CommittedEventStream Commits)
         {
-            _currentVersions.AddOrUpdate(committedEvents.Source.EventSource, committedEvents.Source.Version, (key, value) => committedEvents.Source.Version);
+            _currentVersions.AddOrUpdate(Commits.Source.EventSource, Commits.Source.Version, (key, value) => Commits.Source.Version);
         }
 
         void ThrowIfDuplicate(CommitId commitId)
@@ -85,21 +85,21 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         }
 
         /// <inheritdoc />
-        public CommittedEvents Fetch(EventSourceId eventSourceId)
+        public Commits Fetch(EventSourceId eventSourceId)
         {
-            return new CommittedEvents(_commits.Where(c => c.Source.EventSource == eventSourceId).ToList());
+            return new Commits(_commits.Where(c => c.Source.EventSource == eventSourceId).ToList());
         }
 
         /// <inheritdoc />
-        public CommittedEvents FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
+        public Commits FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
         {
-            return new CommittedEvents(_commits.Where(c => c.Source.EventSource == eventSourceId && c.Source.Version.Commit >= commitVersion).ToList());
+            return new Commits(_commits.Where(c => c.Source.EventSource == eventSourceId && c.Source.Version.Commit >= commitVersion).ToList());
         }
 
         /// <inheritdoc />
-        public CommittedEvents FetchAllCommitsAfter(CommitSequenceNumber commit)
+        public Commits FetchAllCommitsAfter(CommitSequenceNumber commit)
         {
-            return new CommittedEvents(_commits.Where(c => c.Sequence > commit).ToList());
+            return new Commits(_commits.Where(c => c.Sequence > commit).ToList());
         }
 
         /// <inheritdoc />

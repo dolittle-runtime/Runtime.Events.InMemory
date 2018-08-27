@@ -65,21 +65,21 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         }
         
         /// <inheritdoc />
-        public CommittedEvents Fetch(EventSourceId eventSourceId)
+        public Commits Fetch(EventSourceId eventSourceId)
         {
             ThrowIfDisposed();
             return _event_committer_and_fetcher.Fetch(eventSourceId);
         }
 
         /// <inheritdoc />
-        public CommittedEvents FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
+        public Commits FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
         {
             ThrowIfDisposed();
             return _event_committer_and_fetcher.FetchFrom(eventSourceId,commitVersion);
         }
 
          /// <inheritdoc />
-        public CommittedEvents FetchAllCommitsAfter(CommitSequenceNumber commit)
+        public Commits FetchAllCommitsAfter(CommitSequenceNumber commit)
         {
             ThrowIfDisposed();
             return _event_committer_and_fetcher.FetchAllCommitsAfter(commit);
