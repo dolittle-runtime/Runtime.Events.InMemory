@@ -124,7 +124,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             {
                 return v.Version;
             }
-            return EventSourceVersion.Initial();
+            return EventSourceVersion.Initial;
         }
 
          SingleEventTypeEventStream GetEventsFromCommits(IEnumerable<CommittedEventStream> commits, ArtifactId eventType)
