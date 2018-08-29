@@ -97,10 +97,16 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             return _event_committer_and_fetcher.FetchAllEventsOfTypeAfter(eventType,commit);
         }
         /// <inheritdoc />
-        public EventSourceVersion GetVersionFor(EventSourceId eventSourceId)
+        public EventSourceVersion GetCurrentVersionFor(EventSourceId eventSource)
         {
             ThrowIfDisposed();
-            return _event_committer_and_fetcher.GetVersionFor(eventSourceId);
+            return _event_committer_and_fetcher.GetCurrentVersionFor(eventSource);
+        }
+        /// <inheritdoc />
+        public EventSourceVersion GetNextVersionFor(EventSourceId eventSource)
+        {
+            ThrowIfDisposed();
+            return _event_committer_and_fetcher.GetNextVersionFor(eventSource);
         }
     }
 }
