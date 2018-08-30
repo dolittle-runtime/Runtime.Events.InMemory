@@ -116,17 +116,6 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             return GetEventsFromCommits(commits, artifactId);
         }
 
-        /// <inheritdoc />
-        public EventSourceVersion GetVersionFor(EventSourceId eventSource)
-        {
-            VersionedEventSource v;
-            if(_versions.TryGetValue(eventSource, out v))
-            {
-                return v.Version;
-            }
-            return EventSourceVersion.Initial;
-        }
-
          SingleEventTypeEventStream GetEventsFromCommits(IEnumerable<CommittedEventStream> commits, ArtifactId eventType)
          {
             var events = new List<CommittedEventEnvelope>();
@@ -136,5 +125,21 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             }
             return new SingleEventTypeEventStream(events);
          }
+
+        /// <inheritdoc />
+        public EventSourceVersion GetCurrentVersionFor(EventSourceId eventSource)
+        {
+            VersionedEventSource v;
+            if(_versions.TryGetValue(eventSource, out v))
+            {
+                return v.Version;
+            }
+            return EventSourceVersion.NoVersion;
+        }
+        /// <inheritdoc />
+        public EventSourceVersion GetNextVersionFor(EventSourceId eventSource)
+        {
+            return GetCurrentVersionFor(eventSource).NextCommit();
+        }
     }
 }
