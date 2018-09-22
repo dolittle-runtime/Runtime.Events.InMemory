@@ -127,7 +127,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             var events = new List<CommittedEventEnvelope>();
             foreach(var commit in commits)
             {
-                events.AddRange(commit.Events.FilteredByEventType(eventType).Select(e => new CommittedEventEnvelope(commit.Sequence,e.Id,e.Metadata,e.Event)));
+                events.AddRange(commit.Events.FilteredByEventType(eventType).Select(e => new CommittedEventEnvelope(commit.Sequence,e.Metadata,e.Event)));
             }
             return new SingleEventTypeEventStream(events);
          }
