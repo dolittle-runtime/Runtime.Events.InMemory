@@ -26,8 +26,8 @@ namespace Dolittle.Runtime.Events.Store.InMemory
 
         private readonly List<CommittedEventStream> _commits = new List<CommittedEventStream>();
         private readonly HashSet<CommitId> _duplicates = new HashSet<CommitId>();
-        private readonly ConcurrentDictionary<EventSourceId,VersionedEventSource> _versions = new ConcurrentDictionary<EventSourceId,VersionedEventSource>();
-        private readonly ConcurrentDictionary<EventSourceId,EventSourceVersion> _currentVersions = new ConcurrentDictionary<EventSourceId,EventSourceVersion>();
+        private readonly ConcurrentDictionary<EventSourceKey,VersionedEventSource> _versions = new ConcurrentDictionary<EventSourceKey,VersionedEventSource>();
+        private readonly ConcurrentDictionary<EventSourceKey,EventSourceVersion> _currentVersions = new ConcurrentDictionary<EventSourceKey,EventSourceVersion>();
 
         private ulong _sequenceNumber = 0;
 
@@ -60,14 +60,14 @@ namespace Dolittle.Runtime.Events.Store.InMemory
                 var commit = new CommittedEventStream(commitSequenceNumber, uncommittedEvents.Source, uncommittedEvents.Id, uncommittedEvents.CorrelationId, uncommittedEvents.Timestamp, uncommittedEvents.Events);
                 _commits.Add(commit);
                 _duplicates.Add(commit.Id);
-                _versions.AddOrUpdate(commit.Source.EventSource,commit.Source,(id,ver) => commit.Source);
+                _versions.AddOrUpdate(commit.Source.Key,commit.Source,(id,ver) => commit.Source);
                 return commit;
             }
         }
 
         void UpdateVersion(CommittedEventStream Commits)
         {
-            _currentVersions.AddOrUpdate(Commits.Source.EventSource, Commits.Source.Version, (key, value) => Commits.Source.Version);
+            _currentVersions.AddOrUpdate(Commits.Source.Key, Commits.Source.Version, (key, value) => Commits.Source.Version);
         }
 
         void ThrowIfDuplicate(CommitId commitId)
@@ -81,7 +81,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         void ThrowIfConcurrencyConflict(VersionedEventSource version)
         {
             VersionedEventSource ver;
-            if(_versions.TryGetValue(version.EventSource, out ver))
+            if(_versions.TryGetValue(version.Key, out ver))
             {
                 if (ver == version || ver.Version.Commit >= version.Version.Commit)
                 {
@@ -91,15 +91,15 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         }
 
         /// <inheritdoc />
-        public Commits Fetch(EventSourceId eventSourceId)
+        public Commits Fetch(EventSourceKey key)
         {
-            return new Commits(_commits.Where(c => c.Source.EventSource == eventSourceId).ToList());
+            return new Commits(_commits.Where(c => c.Source.Key == key).ToList());
         }
 
         /// <inheritdoc />
-        public Commits FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
+        public Commits FetchFrom(EventSourceKey key, CommitVersion commitVersion)
         {
-            return new Commits(_commits.Where(c => c.Source.EventSource == eventSourceId && c.Source.Version.Commit >= commitVersion).ToList());
+            return new Commits(_commits.Where(c => c.Source.Key == key && c.Source.Version.Commit >= commitVersion).ToList());
         }
 
         /// <inheritdoc />
@@ -133,7 +133,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
          }
 
         /// <inheritdoc />
-        public EventSourceVersion GetCurrentVersionFor(EventSourceId eventSource)
+        public EventSourceVersion GetCurrentVersionFor(EventSourceKey eventSource)
         {
             VersionedEventSource v;
             if(_versions.TryGetValue(eventSource, out v))
@@ -143,7 +143,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             return EventSourceVersion.NoVersion;
         }
         /// <inheritdoc />
-        public EventSourceVersion GetNextVersionFor(EventSourceId eventSource)
+        public EventSourceVersion GetNextVersionFor(EventSourceKey eventSource)
         {
             return GetCurrentVersionFor(eventSource).NextCommit();
         }

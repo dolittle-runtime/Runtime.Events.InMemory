@@ -71,17 +71,17 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         }
         
         /// <inheritdoc />
-        public Commits Fetch(EventSourceId eventSourceId)
+        public Commits Fetch(EventSourceKey eventSource)
         {
             ThrowIfDisposed();
-            return _event_committer_and_fetcher.Fetch(eventSourceId);
+            return _event_committer_and_fetcher.Fetch(eventSource);
         }
 
         /// <inheritdoc />
-        public Commits FetchFrom(EventSourceId eventSourceId, CommitVersion commitVersion)
+        public Commits FetchFrom(EventSourceKey eventSource, CommitVersion commitVersion)
         {
             ThrowIfDisposed();
-            return _event_committer_and_fetcher.FetchFrom(eventSourceId,commitVersion);
+            return _event_committer_and_fetcher.FetchFrom(eventSource,commitVersion);
         }
 
          /// <inheritdoc />
@@ -103,13 +103,13 @@ namespace Dolittle.Runtime.Events.Store.InMemory
             return _event_committer_and_fetcher.FetchAllEventsOfTypeAfter(eventType,commit);
         }
         /// <inheritdoc />
-        public EventSourceVersion GetCurrentVersionFor(EventSourceId eventSource)
+        public EventSourceVersion GetCurrentVersionFor(EventSourceKey eventSource)
         {
             ThrowIfDisposed();
             return _event_committer_and_fetcher.GetCurrentVersionFor(eventSource);
         }
         /// <inheritdoc />
-        public EventSourceVersion GetNextVersionFor(EventSourceId eventSource)
+        public EventSourceVersion GetNextVersionFor(EventSourceKey eventSource)
         {
             ThrowIfDisposed();
             return _event_committer_and_fetcher.GetNextVersionFor(eventSource);
