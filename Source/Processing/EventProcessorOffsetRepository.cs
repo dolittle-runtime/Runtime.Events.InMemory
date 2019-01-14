@@ -42,6 +42,7 @@ namespace Dolittle.Runtime.Events.Processing.InMemory
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <inheritdoc/>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -65,6 +66,8 @@ namespace Dolittle.Runtime.Events.Processing.InMemory
         // }
 
         // This code added to correctly implement the disposable pattern.
+
+        /// <inheritdoc/>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

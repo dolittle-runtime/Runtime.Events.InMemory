@@ -7,6 +7,7 @@
 namespace Dolittle.Runtime.Events.Relativity.InMemory
 {
     using Dolittle.Runtime.Events.Processing;
+    using Dolittle.Runtime.Events.Processing.InMemory;
     using Dolittle.Runtime.Events.Store;
     using System.Collections.Concurrent;
 
@@ -42,6 +43,7 @@ namespace Dolittle.Runtime.Events.Relativity.InMemory
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <inheritdoc/>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -65,6 +67,7 @@ namespace Dolittle.Runtime.Events.Relativity.InMemory
         // }
 
         // This code added to correctly implement the disposable pattern.
+        /// <inheritdoc/>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
