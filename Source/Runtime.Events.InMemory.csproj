@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Build/MSBuild/default.props" />
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,8 +8,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference  Include="Dolittle.Execution" Version="2.0.0-*" />
-    <PackageReference  Include="Dolittle.Runtime.Events" Version="2.0.0-*" />
+    <PackageReference  Include="Dolittle.Execution" Version="2.*" />
+    <PackageReference  Include="Dolittle.Runtime.Events" Version="2.*" />
   </ItemGroup>
 
 </Project>
