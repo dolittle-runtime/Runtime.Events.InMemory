@@ -14,12 +14,14 @@ using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
 using Dolittle.Artifacts;
 using Dolittle.Execution;
+using Dolittle.Lifecycle;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
     /// <summary>
     /// Manages the committing and fetching of event streams for the <see cref="EventStore" />
     /// </summary>
+    [Singleton]
     public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents, IFetchEventSourceVersion
     {
         private readonly object lock_object = new object();
