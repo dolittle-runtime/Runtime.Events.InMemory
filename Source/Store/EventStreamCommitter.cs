@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Dolittle.Lifecycle;
 using Dolittle.Events;
 using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
@@ -20,6 +21,7 @@ namespace Dolittle.Runtime.Events.Store.InMemory
     /// <summary>
     /// Manages the committing and fetching of event streams for the <see cref="EventStore" />
     /// </summary>
+    [SingletonPerTenant]
     public class EventStreamCommitterAndFetcher : ICommitEventStreams, IFetchCommittedEvents, IFetchEventSourceVersion
     {
         private readonly object lock_object = new object();
