@@ -15,7 +15,6 @@ using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
 using Dolittle.Artifacts;
 using Dolittle.Execution;
-using Dolittle.Lifecycle;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
