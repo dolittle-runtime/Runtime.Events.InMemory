@@ -11,6 +11,7 @@ using Dolittle.Events;
 using Dolittle.Runtime.Events;
 using Dolittle.Runtime.Events.Store;
 using Dolittle.Artifacts;
+using Dolittle.Lifecycle;
 
 namespace Dolittle.Runtime.Events.Store.InMemory
 {
@@ -25,9 +26,16 @@ namespace Dolittle.Runtime.Events.Store.InMemory
         /// <summary>
         /// Instantiates a new instance of the <see cref="EventStore" />
         /// </summary>
-        public EventStore()
+        public EventStore() : this(new EventStreamCommitterAndFetcher())
         {
-            _event_committer_and_fetcher = new EventStreamCommitterAndFetcher();
+        }
+
+        /// <summary>
+        /// Instantiates a new instance of the <see cref="EventStore" />
+        /// </summary>
+        public EventStore(EventStreamCommitterAndFetcher committerAndFetcher)
+        {
+            _event_committer_and_fetcher = committerAndFetcher;
         }
 
         /// <inheritdoc />
